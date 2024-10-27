@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+          content="A simple todo list application to manage your tasks" />
+    <meta name="keywords"
+          content="todo list, task management, tasks, productivity" />
+    <title>Todo List</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <style>
+      nav {
+        padding: 1rem;
+        margin-bottom: 2rem;
+        background: var(--card-background-color);
+        border-radius: var(--border-radius);
+      }
+
+      nav ul {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 1rem;
+        list-style: none;
+      }
+
+      nav a {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        background: var(--card-sectionning-background-color);
+        color: var(--contrast);
+        border: 1px solid var(--primary);
+        transition: all 0.2s ease;
+      }
+
+      nav a:hover {
+        background: var(--primary);
+        color: var(--primary-inverse);
+        transform: translateY(-2px);
+      }
+
+      nav a.active {
+        background: var(--primary);
+        color: var(--primary-inverse);
+        border-color: var(--primary);
+      }
+
+      nav a[role="button"].active {
+        background: var(--primary);
+        color: var(--primary-inverse);
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <ul>
+        <li>
+          <a href="{% url 'todo_list' %}"
+             role="button"
+             {% if request.resolver_match.url_name == 'todo_list' %}class="active"{% endif %}>Todo List</a>
+        </li>
+        <li>
+          <a href="{% url 'create_todo' %}"
+             role="button"
+             {% if request.resolver_match.url_name == 'create_todo' %}class="active"{% endif %}>Create Todo</a>
+        </li>
+      </ul>
+    </nav>
+    {% block content %}
+    {% endblock content %}
+  </body>
+</html>

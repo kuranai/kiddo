@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container">
+    <h1>Todo List</h1>
+    {% for todo in todos %}
+      <article class="todo-item">
+        <div class="todo-header">
+          <input type="checkbox"
+                 class="todo-checkbox"
+                 data-todo-id="{{ todo.id }}"
+                 {% if todo.completed %}checked{% endif %} />
+          <div class="todo-content">
+            <h3 class="{% if todo.completed %}completed{% endif %}">
+              {{ todo.title }}
+              <a href="{% url 'edit_todo' todo.id %}"
+                 role="button"
+                 class="outline edit-btn">Edit</a>
+            </h3>
+            {% if todo.description|length > 0 %}
+              <p class="todo-description {% if todo.completed %}completed{% endif %}">{{ todo.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+  <script>
+  document.querySelectorAll(".todo-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", function () {
+      const todoId = this.dataset.todoId;
+      fetch(`/todos/${todoId}/toggle/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            const todoContent = this.parentElement.querySelector(".todo-content");
+            const title = todoContent.querySelector("h3");
+            const description = todoContent.querySelector(".todo-description");
+            if (data.completed) {
+              title.classList.add("completed");
+              if (description) description.classList.add("completed");
+            } else {
+              title.classList.remove("completed");
+              if (description) description.classList.remove("completed");
+            }
+          }
+        });
+    });
+  });
+
+  // Helper function to get CSRF token
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  </script>
+  <style>
+  article.todo-item {
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .todo-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .todo-header h3 {
+    margin: 0;
+  }
+
+  .completed {
+    text-decoration: line-through;
+    color: #888;
+  }
+
+  .todo-content {
+    flex: 1;
+  }
+
+  .todo-description {
+    margin: 0.5rem 0 0 0;
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  .edit-btn {
+    font-size: 0.8em;
+    padding: 0.2rem 0.5rem;
+    margin-left: 0.5rem;
+  }
+  </style>
+{% endblock content %}
