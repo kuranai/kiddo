@@ -43,4 +43,10 @@ class TodoToggleComplete(LoginRequiredMixin, View):
         todo = get_object_or_404(Todo, pk=pk, user=request.user)
         todo.completed = not todo.completed
         todo.save()
+
+        # If the todo is completed and it's recurring,
+        # check/update next occurrence
+        if todo.completed and todo.recurrence != "none":
+            todo.create_next_occurrence()
+
         return JsonResponse({"status": "success", "completed": todo.completed})

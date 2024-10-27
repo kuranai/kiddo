@@ -19,6 +19,14 @@
             {% if todo.description|length > 0 %}
               <p class="todo-description {% if todo.completed %}completed{% endif %}">{{ todo.description }}</p>
             {% endif %}
+            {% if todo.recurrence != 'none' %}
+              <div class="todo-recurrence">
+                <small>
+                  Repeats: {{ todo.get_recurrence_display }}
+                  {% if todo.due_time %}at {{ todo.due_time|time:"H:i" }}{% endif %}
+                </small>
+              </div>
+            {% endif %}
           </div>
         </div>
       </article>
@@ -104,5 +112,21 @@
     padding: 0.2rem 0.5rem;
     margin-left: 0.5rem;
   }
+
+  .todo-recurrence {
+    margin-top: 0.5rem;
+    font-size: 0.8em;
+    color: var(--primary);
+  }
+
+  /* Remove the shadow effect from todo items */
+  .todo-item {
+    border: 1px solid #eee;
+    box-shadow: none !important;
+    /* If you still see a shadow, you might need these as well: */
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+  }
+
   </style>
 {% endblock content %}
