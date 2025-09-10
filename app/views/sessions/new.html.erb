@@ -1,0 +1,38 @@
+<div class="min-h-screen flex items-center justify-center bg-base-200">
+  <div class="card w-full max-w-sm shadow-2xl bg-base-100">
+    <div class="card-body">
+      <div class="text-center mb-6">
+        <h1 class="text-3xl font-bold text-primary">Kiddo</h1>
+        <p class="text-base-content/70">Family Todo & Rewards</p>
+      </div>
+
+      <%= form_with url: login_path, method: :post, local: true, class: "space-y-4" do |form| %>
+        <div class="form-control">
+          <%= form.label :email, class: "label" do %>
+            <span class="label-text">Email</span>
+          <% end %>
+          <%= form.email_field :email, class: "input input-bordered w-full", placeholder: "Enter your email", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= form.label :password, class: "label" do %>
+            <span class="label-text">Password</span>
+          <% end %>
+          <%= form.password_field :password, class: "input input-bordered w-full", placeholder: "Enter your password", required: true %>
+        </div>
+
+        <div class="form-control mt-6">
+          <%= form.submit "Sign In", class: "btn btn-primary w-full" %>
+        </div>
+      <% end %>
+
+      <% if User.table_exists? && User.count == 0 %>
+        <div class="divider">OR</div>
+        <div class="text-center">
+          <p class="text-sm text-base-content/70 mb-3">First time? Create your family account</p>
+          <%= link_to "Create Family Account", new_user_path, class: "btn btn-outline btn-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

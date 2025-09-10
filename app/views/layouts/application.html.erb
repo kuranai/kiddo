@@ -23,7 +23,59 @@
   </head>
 
   <body>
-    <main class="container mx-auto mt-28 px-5 flex">
+    <% if logged_in? %>
+      <div class="navbar bg-base-100 shadow-lg">
+        <div class="flex-1">
+          <%= link_to dashboard_path, class: "btn btn-ghost text-xl" do %>
+            <span class="text-primary font-bold">Kiddo</span>
+          <% end %>
+        </div>
+
+        <div class="flex-none gap-2">
+          <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+              <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                <span class="text-sm font-medium"><%= current_user.name.first.upcase %></span>
+              </div>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+              <li class="menu-title">
+                <span><%= current_user.name %></span>
+                <span class="text-xs"><%= current_user.points_balance %> points</span>
+              </li>
+              <li><%= link_to "Dashboard", dashboard_path %></li>
+              <li><%= link_to "Profile", user_path(current_user) %></li>
+              <% if current_user.parent? %>
+                <li><%= link_to "Family Members", users_path %></li>
+                <li><%= link_to "Add Member", new_user_path %></li>
+              <% end %>
+              <li>
+                <%= link_to "Sign Out", logout_path, data: { 
+                  "turbo-method": :delete,
+                  "turbo-confirm": "Are you sure you want to sign out?" 
+                } %>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if notice %>
+      <div class="alert alert-success shadow-lg mb-4 mx-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span><%= notice %></span>
+      </div>
+    <% end %>
+
+    <% if alert %>
+      <div class="alert alert-error shadow-lg mb-4 mx-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span><%= alert %></span>
+      </div>
+    <% end %>
+
+    <main class="<%= logged_in? ? "container mx-auto px-4 py-6" : "" %>">
       <%= yield %>
     </main>
   </body>

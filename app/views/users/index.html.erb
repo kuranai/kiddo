@@ -1,0 +1,49 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold">Family Members</h1>
+      <p class="text-base-content/70">Manage your family members</p>
+    </div>
+    <%= link_to "Add Member", new_user_path, class: "btn btn-primary" %>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <% @users.each do |user| %>
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <div class="flex items-center space-x-4">
+            <div class="avatar">
+              <div class="w-16 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                <span class="text-xl font-bold"><%= user.name.first.upcase %></span>
+              </div>
+            </div>
+            <div class="flex-1">
+              <h2 class="card-title"><%= user.name %></h2>
+              <div class="flex flex-col space-y-1">
+                <div class="badge <%= user.parent? ? 'badge-secondary' : 'badge-primary' %>">
+                  <%= user.role.humanize %>
+                </div>
+                <div class="text-sm text-base-content/70">
+                  <span class="font-semibold"><%= user.points_balance %></span> points
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-actions justify-end mt-4">
+            <%= link_to "View Profile", user_path(user), class: "btn btn-sm btn-outline" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @users.empty? %>
+    <div class="text-center py-12">
+      <div class="text-6xl mb-4">👨‍👩‍👧‍👦</div>
+      <h3 class="text-xl font-semibold mb-2">No family members yet</h3>
+      <p class="text-base-content/70 mb-4">Add your first family member to get started</p>
+      <%= link_to "Add First Member", new_user_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>

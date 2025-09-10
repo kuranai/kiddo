@@ -1,0 +1,78 @@
+<div class="min-h-screen flex items-center justify-center bg-base-200">
+  <div class="card w-full max-w-md shadow-2xl bg-base-100">
+    <div class="card-body">
+      <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold">
+          <%= current_user ? "Add Family Member" : "Create Family Account" %>
+        </h1>
+        <p class="text-base-content/70">
+          <%= current_user ? "Add a new family member" : "Set up your family's todo system" %>
+        </p>
+      </div>
+
+      <%= form_with model: @user, local: true, class: "space-y-4" do |form| %>
+        <% if @user.errors.any? %>
+          <div class="alert alert-error">
+            <ul class="list-disc list-inside">
+              <% @user.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="form-control">
+          <%= form.label :name, class: "label" do %>
+            <span class="label-text">Full Name</span>
+          <% end %>
+          <%= form.text_field :name, class: "input input-bordered w-full", placeholder: "Enter full name", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= form.label :email, class: "label" do %>
+            <span class="label-text">Email</span>
+          <% end %>
+          <%= form.email_field :email, class: "input input-bordered w-full", placeholder: "Enter email address", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= form.label :role, class: "label" do %>
+            <span class="label-text">Role</span>
+          <% end %>
+          <%= form.select :role, 
+                options_for_select([
+                  ['Parent (Can create todos for everyone)', 'parent'],
+                  ['Kid (Can create todos for self)', 'kid']
+                ], @user.role), 
+                { prompt: 'Select role...' }, 
+                { class: "select select-bordered w-full", required: true } %>
+        </div>
+
+        <div class="form-control">
+          <%= form.label :password, class: "label" do %>
+            <span class="label-text">Password</span>
+          <% end %>
+          <%= form.password_field :password, class: "input input-bordered w-full", placeholder: "Enter password", required: true %>
+        </div>
+
+        <div class="form-control">
+          <%= form.label :password_confirmation, class: "label" do %>
+            <span class="label-text">Confirm Password</span>
+          <% end %>
+          <%= form.password_field :password_confirmation, class: "input input-bordered w-full", placeholder: "Confirm password", required: true %>
+        </div>
+
+        <div class="form-control mt-6">
+          <%= form.submit current_user ? "Add Family Member" : "Create Account", 
+                class: "btn btn-primary w-full" %>
+        </div>
+      <% end %>
+
+      <div class="text-center mt-4">
+        <%= link_to current_user ? "Back to Dashboard" : "Already have an account? Sign In", 
+              current_user ? dashboard_path : login_path, 
+              class: "link link-primary text-sm" %>
+      </div>
+    </div>
+  </div>
+</div>
