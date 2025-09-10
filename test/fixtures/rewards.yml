@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+ice_cream:
+  name: "Ice cream cone"
+  description: "Choose any flavor ice cream cone from the freezer"
+  point_cost: 15
+  active: true
+
+movie_night:
+  name: "Movie night choice"
+  description: "Get to pick the family movie for movie night"
+  point_cost: 25
+  active: true

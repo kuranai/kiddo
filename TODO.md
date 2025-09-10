@@ -34,29 +34,31 @@ A simplified family todo list and rewards system where kids and parents can crea
 ## Phase 2: Core Data Models
 
 ### 2.1 Todo Model
-- [ ] Generate Todo model
-- [ ] Todo attributes: `title:string`, `description:text`, `points:integer`, `assignee_id:integer`, `creator_id:integer`, `due_date:datetime`, `completed:boolean`, `completed_at:datetime`
-- [ ] Add associations: `belongs_to :assignee, class_name: 'User'`, `belongs_to :creator, class_name: 'User'`
-- [ ] Add validations and scopes
-- [ ] Add methods: `completable_by?(user)`, `complete!`, `overdue?`
+- [x] Generate Todo model
+- [x] Todo attributes: `title:string`, `description:text`, `points:integer`, `assignee_id:integer`, `creator_id:integer`, `due_date:datetime`, `completed:boolean`, `completed_at:datetime`
+- [x] Add associations: `belongs_to :assignee, class_name: 'User'`, `belongs_to :creator, class_name: 'User'`
+- [x] Add validations and scopes
+- [x] Add methods: `completable_by?(user)`, `complete!`, `overdue?`
 
 ### 2.2 Recurring Todos
-- [ ] Add recurring fields to Todo: `recurring:boolean`, `recurring_type:integer` (daily/weekly/monthly), `recurring_days:text`
-- [ ] Create RecurringTodo model for template management
-- [ ] Set up Solid Queue job for creating recurring todos
-- [ ] Add logic to generate new todos based on recurring templates
+- [x] Add recurring fields to Todo: `recurring:boolean`, `recurring_type:integer` (daily/weekly/monthly), `recurring_days:text`
+- [x] Add `family_wide:boolean` field to Todo model
+- [x] Add logic to generate new todos based on recurring templates (`generate_next_occurrence`)
+- [ ] Set up Solid Queue job for creating recurring todos (moved to Phase 4)
 
 ### 2.3 Reward Model
-- [ ] Generate Reward model
-- [ ] Reward attributes: `name:string`, `description:text`, `point_cost:integer`, `active:boolean`
-- [ ] Add validations
-- [ ] Add methods: `affordable_by?(user)`, `redeem_for!(user)`
+- [x] Generate Reward model
+- [x] Reward attributes: `name:string`, `description:text`, `point_cost:integer`, `active:boolean`
+- [x] Add validations
+- [x] Add methods: `affordable_by?(user)`, `redeem_for!(user)`
 
 ### 2.4 Point Transaction Model
-- [ ] Generate PointTransaction model
-- [ ] PointTransaction attributes: `user:references`, `amount:integer`, `description:string`, `todo:references`, `reward:references`, `transaction_type:integer`
-- [ ] Add associations and validations
-- [ ] Add scopes: `earnings`, `spendings`, `recent`
+- [x] Generate PointTransaction model
+- [x] PointTransaction attributes: `user:references`, `amount:integer`, `description:string`, `todo:references`, `reward:references`, `transaction_type:integer`
+- [x] Add associations and validations
+- [x] Add scopes: `earnings`, `spendings`, `recent`
+- [x] Update User model with `add_points` and `deduct_points` methods
+- [x] Integrate point transactions with todo completion and reward redemption
 
 ---
 
@@ -226,7 +228,7 @@ A simplified family todo list and rewards system where kids and parents can crea
 
 ## Progress Tracking
 - [x] Phase 1: Authentication & User Management ✅
-- [ ] Phase 2: Core Data Models  
+- [x] Phase 2: Core Data Models ✅
 - [ ] Phase 3: Controllers & Routes
 - [ ] Phase 4: Background Jobs & Recurring Tasks
 - [ ] Phase 5: Views & UI with DaisyUI
@@ -236,14 +238,15 @@ A simplified family todo list and rewards system where kids and parents can crea
 
 **Started**: September 9, 2025
 **Target Completion**: [Date]
-**Status**: Phase 1 Complete ✅ - Authentication system ready!
+**Status**: Phase 2 Complete ✅ - Core data models ready with full point system!
 
 ---
 
 ## Next Steps
-1. Add bcrypt gem to Gemfile
-2. Generate User model with authentication
-3. Create basic authentication system
-4. Build out core models (Todo, Reward, PointTransaction)
+1. Create TodosController with CRUD operations
+2. Create RewardsController with management/redemption
+3. Set up proper routes for all controllers
+4. Add authorization logic for todo/reward access
+5. Build todo and reward views with DaisyUI
 
 *This document will be updated as features are implemented and requirements evolve.*

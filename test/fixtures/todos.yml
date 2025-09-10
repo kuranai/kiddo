@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+chore:
+  title: "Take out trash"
+  description: "Take the trash bins to the curb"
+  points: 5
+  assignee: kid
+  creator: parent
+  due_date: 2025-09-15 18:00:00
+  completed: false
+  completed_at: 
+  recurring: false
+  recurring_type:
+  recurring_days:
+  family_wide: false
+
+homework:
+  title: "Finish math homework"
+  description: "Complete pages 15-20 in math workbook"
+  points: 10
+  assignee: kid
+  creator: parent
+  due_date: 2025-09-11 20:00:00
+  completed: true
+  completed_at: 2025-09-10 19:30:00
+  recurring: false
+  recurring_type:
+  recurring_days:
+  family_wide: false

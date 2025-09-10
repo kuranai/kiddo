@@ -97,55 +97,65 @@ This project is inspired by the [Family Rewards App](https://www.familyrewards.a
 - deduct_points(amount, description)
 ```
 
-#### Todo (Planned)
+#### Todo ✅
 ```ruby
 # Attributes
-- title: string
+- title: string (required, max 255 chars)
 - description: text
-- points: integer
-- assignee_id: integer (User)
-- creator_id: integer (User)
-- due_date: datetime
-- completed: boolean
+- points: integer (required, > 0)
+- assignee_id: integer (User, required)
+- creator_id: integer (User, required)
+- due_date: datetime (optional)
+- completed: boolean (default: false)
 - completed_at: datetime
-- recurring: boolean
+- recurring: boolean (default: false)
 - recurring_type: integer (daily/weekly/monthly)
-- family_wide: boolean
+- recurring_days: text
+- family_wide: boolean (default: false)
 
 # Key Methods
-- completable_by?(user)
-- complete!(user)
-- overdue?
-- generate_next_occurrence
-```
-
-#### Reward (Planned)
-```ruby
-# Attributes
-- name: string
-- description: text
-- point_cost: integer
-- active: boolean
-
-# Key Methods
-- affordable_by?(user)
-- redeem_for!(user)
-```
-
-#### PointTransaction (Planned)
-```ruby
-# Attributes
-- user: references
-- amount: integer (positive for earning, negative for spending)
-- description: string
-- todo: references (optional)
-- reward: references (optional)
-- transaction_type: integer (earning/spending)
+- completable_by?(user) - checks if user can complete this todo
+- complete!(user) - marks complete and awards points
+- overdue? - checks if past due date
+- generate_next_occurrence - creates next recurring instance
 
 # Scopes
-- earnings
-- spendings
-- recent
+- completed, pending, overdue, family_wide_available
+- assigned_to(user), created_by(user)
+```
+
+#### Reward ✅
+```ruby
+# Attributes
+- name: string (required, max 255 chars)
+- description: text
+- point_cost: integer (required, > 0)
+- active: boolean (default: true)
+
+# Key Methods
+- affordable_by?(user) - checks if user has enough points
+- redeem_for!(user) - deducts points and creates transaction
+
+# Scopes
+- active, affordable_for(user)
+```
+
+#### PointTransaction ✅
+```ruby
+# Attributes
+- user: references (required)
+- amount: integer (required, positive for earning, negative for spending)
+- description: string (required, 2-500 chars)
+- todo: references (optional)
+- reward: references (optional)
+- transaction_type: integer (earning: 0, spending: 1)
+
+# Validations
+- Must be associated with either a todo or reward
+- Amount cannot be zero
+
+# Scopes
+- earnings, spendings, recent, for_user(user)
 ```
 
 ### Controllers
@@ -192,17 +202,19 @@ This project is inspired by the [Family Rewards App](https://www.familyrewards.a
 - [x] Role-based authorization
 - [x] Responsive navigation and layout
 
-### 🚧 Phase 2: Core Data Models (NEXT)
-- [ ] Todo model with associations and validations
-- [ ] Reward model
-- [ ] PointTransaction model for audit trail
-- [ ] Database relationships and constraints
+### ✅ Phase 2: Core Data Models (COMPLETE)
+- [x] Todo model with associations and validations
+- [x] Reward model with redemption system
+- [x] PointTransaction model for complete audit trail
+- [x] Database relationships and constraints
+- [x] Point system integration with automatic transaction logging
+- [x] Recurring todo logic and family-wide todo support
 
-### 📋 Phase 3: Controllers & Routes (PLANNED)
+### 🚧 Phase 3: Controllers & Routes (NEXT)
 - [ ] TodosController with CRUD operations
 - [ ] RewardsController with management/redemption
 - [ ] Authorization logic for todo/reward access
-- [ ] API-like actions for completing todos
+- [ ] API-like actions for completing todos and claiming family-wide todos
 
 ### ⚙️ Phase 4: Background Jobs & Recurring Tasks (PLANNED)
 - [ ] Solid Queue job for recurring todo generation
@@ -239,7 +251,7 @@ This project is inspired by the [Family Rewards App](https://www.familyrewards.a
 
 ### Database Schema
 ```sql
-# Current Schema (Phase 1)
+# Current Schema (Phases 1 & 2 Complete)
 users:
   - id (primary key)
   - name (string, not null)
@@ -249,19 +261,42 @@ users:
   - points_balance (integer, default: 0, not null)
   - created_at, updated_at
 
-# Planned Schema Extensions (Phase 2+)
 todos:
-  - id, title, description, points, assignee_id, creator_id
-  - due_date, completed, completed_at, recurring, recurring_type
-  - family_wide, created_at, updated_at
+  - id (primary key)
+  - title (string, not null)
+  - description (text)
+  - points (integer, not null, default: 1)
+  - assignee_id (integer, not null, foreign key to users)
+  - creator_id (integer, not null, foreign key to users)
+  - due_date (datetime)
+  - completed (boolean, not null, default: false)
+  - completed_at (datetime)
+  - recurring (boolean, not null, default: false)
+  - recurring_type (integer)
+  - recurring_days (text)
+  - family_wide (boolean, not null, default: false)
+  - created_at, updated_at
+  - indices: assignee_id, creator_id, completed, due_date, family_wide
 
 rewards:
-  - id, name, description, point_cost, active
+  - id (primary key)
+  - name (string, not null)
+  - description (text)
+  - point_cost (integer, not null)
+  - active (boolean, not null, default: true)
   - created_at, updated_at
+  - indices: active, point_cost
 
 point_transactions:
-  - id, user_id, amount, description, todo_id, reward_id
-  - transaction_type, created_at, updated_at
+  - id (primary key)
+  - user_id (integer, not null, foreign key to users)
+  - amount (integer, not null)
+  - description (string, not null)
+  - todo_id (integer, nullable, foreign key to todos)
+  - reward_id (integer, nullable, foreign key to rewards)
+  - transaction_type (integer, not null) # 0=earning, 1=spending
+  - created_at, updated_at
+  - indices: transaction_type, created_at, [user_id, created_at]
 ```
 
 ## Security Considerations
@@ -373,7 +408,16 @@ bin/brakeman
 ---
 
 **Project Started**: September 9, 2025  
-**Current Status**: Phase 1 Complete - Authentication system ready  
-**Next Milestone**: Phase 2 - Core Data Models (Todos, Rewards, Points)  
+**Current Status**: Phase 2 Complete - Core data models and point system ready  
+**Next Milestone**: Phase 3 - Controllers & Routes (TodosController, RewardsController)  
 **Repository**: `/home/ploi/code/ruby/kiddo`  
 **Running Instance**: http://127.0.0.1:3000
+
+### Phase 2 Accomplishments ✅
+- **Complete Todo system** with automatic point awarding
+- **Reward redemption** with point deduction and transaction logging  
+- **Point transaction audit trail** for complete transparency
+- **Family-wide todos** that can be claimed by anyone
+- **Recurring todo logic** for daily/weekly/monthly tasks
+- **Database integrity** with proper foreign keys, constraints, and indices
+- **Model integration** with comprehensive business logic

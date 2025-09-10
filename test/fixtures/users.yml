@@ -1,15 +1,15 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  name: MyString
-  email: MyString
-  password_digest: MyString
+parent:
+  name: "John Parent"
+  email: "parent@example.com"
+  password_digest: "$2a$12$K/BqKXU6ZpbQP8D4h8lDpuiQ.VjU4wZO3IjUJXxO5uI7k/z2tXDGu"
   role: 1
-  points_balance: 1
+  points_balance: 0
 
-two:
-  name: MyString
-  email: MyString
-  password_digest: MyString
-  role: 1
-  points_balance: 1
+kid:
+  name: "Jane Kid"
+  email: "kid@example.com" 
+  password_digest: "$2a$12$K/BqKXU6ZpbQP8D4h8lDpuiQ.VjU4wZO3IjUJXxO5uI7k/z2tXDGu"
+  role: 0
+  points_balance: 10

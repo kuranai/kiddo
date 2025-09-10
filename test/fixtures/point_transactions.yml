@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+earning:
+  user: kid
+  amount: 10
+  description: "Completed: Finish math homework"
+  todo: homework
+  reward: 
+  transaction_type: 0
+
+spending:
+  user: kid
+  amount: -15
+  description: "Redeemed: Ice cream cone"
+  todo: 
+  reward: ice_cream
+  transaction_type: 1

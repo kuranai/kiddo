@@ -1,6 +1,10 @@
 class User < ApplicationRecord
   has_secure_password validations: true
 
+  has_many :assigned_todos, class_name: 'Todo', foreign_key: 'assignee_id', dependent: :destroy
+  has_many :created_todos, class_name: 'Todo', foreign_key: 'creator_id', dependent: :destroy
+  has_many :point_transactions, dependent: :destroy
+
   enum :role, { kid: 0, parent: 1 }
 
   validates :name, presence: true, length: { minimum: 2 }
@@ -21,18 +25,30 @@ class User < ApplicationRecord
     points_balance >= reward.point_cost
   end
 
-  def add_points(amount, description = nil)
-    increment!(:points_balance, amount)
-    # TODO: Create PointTransaction record
+  def add_points(amount, description = nil, todo: nil)
+    transaction do
+      increment!(:points_balance, amount)
+      point_transactions.create!(
+        amount: amount,
+        description: description || "Points added",
+        transaction_type: :earning,
+        todo: todo
+      )
+    end
   end
 
-  def deduct_points(amount, description = nil)
-    if points_balance >= amount
+  def deduct_points(amount, description = nil, reward: nil)
+    return false if points_balance < amount
+    
+    transaction do
       decrement!(:points_balance, amount)
-      # TODO: Create PointTransaction record
+      point_transactions.create!(
+        amount: -amount,
+        description: description || "Points deducted",
+        transaction_type: :spending,
+        reward: reward
+      )
       true
-    else
-      false
     end
   end
 
