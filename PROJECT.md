@@ -178,6 +178,34 @@ This project is inspired by the [Family Rewards App](https://www.familyrewards.a
 - Family overview (for parents)
 - Personal stats and quick actions
 
+#### TodosController
+- Full CRUD operations with role-based authorization
+- Filtering capabilities (mine/family/completed/pending/overdue)
+- Complete, claim, and unclaim actions for todos
+
+#### RewardsController
+- Reward management for parents (CRUD operations)
+- Redemption functionality for kids
+- Active/inactive reward toggling
+
+### Services
+
+#### PointTransactionService
+- Centralized point management with atomic transactions
+- `award_points(user, amount, description, todo: nil)`
+- `deduct_points(user, amount, description, reward: nil)`
+- Enhanced error handling with custom exception classes
+- Comprehensive logging and validation
+
+### Background Jobs
+
+#### RecurringTodoJob
+- Automated creation of recurring todo instances
+- Daily, weekly, and monthly recurring support
+- Duplicate prevention logic
+- Comprehensive error handling and logging
+- Scheduled via Solid Queue at 1 AM daily
+
 ### Views & UI
 
 #### Design System
@@ -218,12 +246,12 @@ This project is inspired by the [Family Rewards App](https://www.familyrewards.a
 - [x] Enhanced DashboardController with role-based data presentation
 - [x] Complete route system with RESTful and custom member routes
 
-### ⚙️ Phase 4: Background Jobs & Recurring Tasks (NEXT)
-- [ ] Solid Queue job for recurring todo generation
-- [ ] Point transaction service
-- [ ] Notification system
+### ✅ Phase 4: Background Jobs & Recurring Tasks (COMPLETE)
+- [x] Solid Queue job for recurring todo generation
+- [x] Point transaction service for centralized point management
+- [x] Enhanced error handling and logging
 
-### 🎨 Phase 5: Views & UI Enhancement (PLANNED)
+### 🎨 Phase 5: Views & UI Enhancement (NEXT)
 - [ ] Todo management interface
 - [ ] Rewards catalog
 - [ ] Point transaction history
@@ -410,17 +438,17 @@ bin/brakeman
 ---
 
 **Project Started**: September 9, 2025  
-**Current Status**: Phase 3 Complete - Full controller layer with authorization system ready  
-**Next Milestone**: Phase 4 - Background Jobs & Recurring Tasks (Solid Queue integration)  
+**Current Status**: Phase 4 Complete - Background jobs and recurring tasks system implemented  
+**Next Milestone**: Phase 5 - Views & UI Enhancement (DaisyUI interface implementation)  
 **Repository**: `/home/ploi/code/ruby/kiddo`  
 **Running Instance**: http://127.0.0.1:3000
 
-### Phase 3 Accomplishments ✅
-- **TodosController** with full CRUD, filtering (mine/family/completed/pending/overdue), and authorization
-- **RewardsController** with creation, redemption, and parental management controls
-- **Enhanced DashboardController** with role-based data presentation for parents vs kids
-- **Complete route system** with RESTful routes plus custom actions (complete, claim, unclaim, redeem, toggle_active)
-- **Authorization system** ensuring parents can manage all, kids restricted to appropriate access
-- **Point system integration** with automatic awarding/deduction and transaction logging
-- **Family-wide todo claiming** with first-come-first-served logic and unclaim functionality
-- **Code quality compliance** with RuboCop Rails Omakase standards
+### Phase 4 Accomplishments ✅
+- **RecurringTodoJob** with Solid Queue for automated recurring todo generation
+- **PointTransactionService** for centralized, atomic point management with enhanced error handling
+- **Scheduled job configuration** in config/recurring.yml for daily recurring todo processing
+- **Refactored point logic** across User, Todo, and Reward models to use centralized service
+- **Enhanced validation and error handling** for point transactions and job processing
+- **Comprehensive logging** for job execution and point transaction monitoring
+- **Validated functionality** through testing both recurring todo generation and point management
+- **Database transaction safety** ensuring atomicity for all point-related operations

@@ -96,16 +96,16 @@ A simplified family todo list and rewards system where kids and parents can crea
 ## Phase 4: Background Jobs & Recurring Tasks
 
 ### 4.1 Recurring Todo Job
-- [ ] Create RecurringTodoJob using Solid Queue
-- [ ] Job logic: find due recurring todos, create new instances
-- [ ] Schedule job to run daily
-- [ ] Add job monitoring and error handling
+- [x] Create RecurringTodoJob using Solid Queue
+- [x] Job logic: find due recurring todos, create new instances
+- [x] Schedule job to run daily
+- [x] Add job monitoring and error handling
 
 ### 4.2 Point Management
-- [ ] Create PointTransactionService
-- [ ] Auto-award points when todo is completed
-- [ ] Deduct points when reward is redeemed
-- [ ] Update user point balances atomically
+- [x] Create PointTransactionService
+- [x] Auto-award points when todo is completed
+- [x] Deduct points when reward is redeemed
+- [x] Update user point balances atomically
 
 ---
 
@@ -234,7 +234,7 @@ A simplified family todo list and rewards system where kids and parents can crea
 - [x] Phase 1: Authentication & User Management ✅
 - [x] Phase 2: Core Data Models ✅
 - [x] Phase 3: Controllers & Routes ✅
-- [ ] Phase 4: Background Jobs & Recurring Tasks
+- [x] Phase 4: Background Jobs & Recurring Tasks ✅
 - [ ] Phase 5: Views & UI with DaisyUI
 - [ ] Phase 6: Advanced Features
 - [ ] Phase 7: Testing & Polish
@@ -242,15 +242,15 @@ A simplified family todo list and rewards system where kids and parents can crea
 
 **Started**: September 9, 2025
 **Target Completion**: [Date]
-**Status**: Phase 3 Complete ✅ - Full controller layer with authorization and point system integration!
+**Status**: Phase 4 Complete ✅ - Background jobs and recurring tasks with PointTransactionService implemented!
 
 ---
 
 ## Next Steps
-1. Create RecurringTodoJob using Solid Queue
-2. Build todo and reward views with DaisyUI
-3. Enhanced dashboard views with statistics
-4. Point transaction history views
-5. Mobile-optimized responsive UI
+1. Build todo and reward views with DaisyUI
+2. Enhanced dashboard views with statistics
+3. Point transaction history views
+4. Mobile-optimized responsive UI
+5. Advanced features and testing
 
 *This document will be updated as features are implemented and requirements evolve.*

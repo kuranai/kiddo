@@ -13,6 +13,6 @@ class CreatePointTransactions < ActiveRecord::Migration[8.0]
 
     add_index :point_transactions, :transaction_type
     add_index :point_transactions, :created_at
-    add_index :point_transactions, [:user_id, :created_at]
+    add_index :point_transactions, [ :user_id, :created_at ]
   end
 end

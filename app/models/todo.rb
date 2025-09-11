@@ -1,6 +1,6 @@
 class Todo < ApplicationRecord
-  belongs_to :assignee, class_name: 'User'
-  belongs_to :creator, class_name: 'User'
+  belongs_to :assignee, class_name: "User"
+  belongs_to :creator, class_name: "User"
   has_many :point_transactions, dependent: :destroy
 
   validates :title, presence: true, length: { minimum: 2, maximum: 255 }
@@ -12,14 +12,14 @@ class Todo < ApplicationRecord
 
   scope :completed, -> { where(completed: true) }
   scope :pending, -> { where(completed: false) }
-  scope :overdue, -> { where('due_date < ? AND completed = ?', Time.current, false) }
+  scope :overdue, -> { where("due_date < ? AND completed = ?", Time.current, false) }
   scope :family_wide_available, -> { where(family_wide: true, completed: false) }
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :created_by, ->(user) { where(creator: user) }
 
   def completable_by?(user)
     return false if completed?
-    
+
     if family_wide?
       true
     else
@@ -29,15 +29,20 @@ class Todo < ApplicationRecord
 
   def complete!(completing_user)
     return false unless completable_by?(completing_user)
-    
+
     transaction do
       update!(
         completed: true,
         completed_at: Time.current,
         assignee: completing_user
       )
-      
-      completing_user.add_points(points, "Completed: #{title}", todo: self)
+
+      PointTransactionService.award_points(
+        completing_user,
+        points,
+        "Completed: #{title}",
+        todo: self
+      )
     end
   end
 
@@ -47,7 +52,7 @@ class Todo < ApplicationRecord
 
   def generate_next_occurrence
     return unless recurring? && recurring_type.present?
-    
+
     next_due_date = case recurring_type.to_sym
     when :daily
       1.day.from_now

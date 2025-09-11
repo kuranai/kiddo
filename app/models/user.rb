@@ -1,8 +1,8 @@
 class User < ApplicationRecord
   has_secure_password validations: true
 
-  has_many :assigned_todos, class_name: 'Todo', foreign_key: 'assignee_id', dependent: :destroy
-  has_many :created_todos, class_name: 'Todo', foreign_key: 'creator_id', dependent: :destroy
+  has_many :assigned_todos, class_name: "Todo", foreign_key: "assignee_id", dependent: :destroy
+  has_many :created_todos, class_name: "Todo", foreign_key: "creator_id", dependent: :destroy
   has_many :point_transactions, dependent: :destroy
 
   enum :role, { kid: 0, parent: 1 }
@@ -26,29 +26,25 @@ class User < ApplicationRecord
   end
 
   def add_points(amount, description = nil, todo: nil)
-    transaction do
-      increment!(:points_balance, amount)
-      point_transactions.create!(
-        amount: amount,
-        description: description || "Points added",
-        transaction_type: :earning,
-        todo: todo
-      )
-    end
+    PointTransactionService.award_points(
+      self,
+      amount,
+      description || "Points added",
+      todo: todo
+    )
   end
 
   def deduct_points(amount, description = nil, reward: nil)
-    return false if points_balance < amount
-    
-    transaction do
-      decrement!(:points_balance, amount)
-      point_transactions.create!(
-        amount: -amount,
-        description: description || "Points deducted",
-        transaction_type: :spending,
+    begin
+      PointTransactionService.deduct_points(
+        self,
+        amount,
+        description || "Points deducted",
         reward: reward
       )
       true
+    rescue PointTransactionService::InsufficientPointsError
+      false
     end
   end
 
