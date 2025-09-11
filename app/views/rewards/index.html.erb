@@ -1,0 +1,252 @@
+<% content_for :title, "Rewards" %>
+
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+  <div>
+    <h1 class="text-3xl font-bold">Rewards Catalog</h1>
+    <p class="text-base-content/60 mt-1">
+      You have <span class="font-bold text-primary"><%= current_user.points_balance %></span> points to spend
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <% if current_user.parent? %>
+      <%= link_to "New Reward", new_reward_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="tabs tabs-lifted mb-6">
+  <%= link_to rewards_path(filter: "all"), 
+      class: "tab #{@filter_type == 'all' ? 'tab-active' : ''}" do %>
+    All Rewards (<%= Reward.active.count %>)
+  <% end %>
+  
+  <%= link_to rewards_path(filter: "affordable"), 
+      class: "tab #{@filter_type == 'affordable' ? 'tab-active' : ''}" do %>
+    Affordable (<%= Reward.active.affordable_for(current_user).count %>)
+  <% end %>
+
+  <% if current_user.parent? %>
+    <%= link_to rewards_path(filter: "all"), 
+        class: "tab" do %>
+      <span class="indicator">
+        Manage All
+        <% if Reward.where(active: false).any? %>
+          <span class="indicator-item badge badge-secondary badge-xs">
+            <%= Reward.where(active: false).count %>
+          </span>
+        <% end %>
+      </span>
+    <% end %>
+  <% end %>
+</div>
+
+<% if @rewards.any? %>
+  <!-- Rewards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <% @rewards.each do |reward| %>
+      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow <%= 'opacity-60' unless reward.active? %>">
+        <div class="card-body">
+          <!-- Reward Header -->
+          <div class="flex justify-between items-start mb-3">
+            <h3 class="card-title text-lg">
+              <%= link_to reward.name, reward_path(reward), class: "hover:text-primary" %>
+            </h3>
+            <% unless reward.active? %>
+              <div class="badge badge-ghost badge-sm">Inactive</div>
+            <% end %>
+          </div>
+
+          <!-- Point Cost -->
+          <div class="mb-4">
+            <div class="text-3xl font-bold text-primary">
+              <%= reward.point_cost %>
+              <span class="text-base font-normal text-base-content/60">points</span>
+            </div>
+            
+            <!-- Affordability Status -->
+            <% if reward.affordable_by?(current_user) %>
+              <div class="badge badge-success badge-sm mt-1">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                You can afford this!
+              </div>
+            <% else %>
+              <div class="badge badge-error badge-sm mt-1">
+                Need <%= reward.point_cost - current_user.points_balance %> more points
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Description -->
+          <% if reward.description.present? %>
+            <p class="text-sm text-base-content/70 mb-4 flex-grow">
+              <%= truncate(reward.description, length: 100) %>
+            </p>
+          <% else %>
+            <div class="flex-grow"></div>
+          <% end %>
+
+          <!-- Action Buttons -->
+          <div class="card-actions justify-end mt-auto">
+            <% if reward.active? %>
+              <!-- Redeem Button -->
+              <% if reward.affordable_by?(current_user) %>
+                <%= link_to redeem_reward_path(reward), 
+                    data: { turbo_method: :patch },
+                    class: "btn btn-success btn-sm",
+                    data: { confirm: "Redeem '#{reward.name}' for #{reward.point_cost} points?" } do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                  Redeem
+                <% end %>
+              <% else %>
+                <button class="btn btn-disabled btn-sm" disabled>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                  Not Enough Points
+                </button>
+              <% end %>
+            <% end %>
+            
+            <!-- Parent Management Buttons -->
+            <% if current_user.parent? %>
+              <!-- Toggle Active/Inactive -->
+              <%= link_to toggle_active_reward_path(reward), 
+                  data: { turbo_method: :patch },
+                  class: "btn btn-ghost btn-sm #{reward.active? ? 'text-warning' : 'text-success'}" do %>
+                <% if reward.active? %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L15 15"></path>
+                  </svg>
+                  Hide
+                <% else %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  Show
+                <% end %>
+              <% end %>
+
+              <%= link_to edit_reward_path(reward), class: "btn btn-ghost btn-sm" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                Edit
+              <% end %>
+              
+              <%= link_to reward_path(reward), 
+                  method: :delete,
+                  class: "btn btn-ghost btn-sm text-error",
+                  data: { confirm: "Are you sure you want to delete '#{reward.name}'?" } do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                Delete
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Show Inactive Rewards for Parents -->
+  <% if current_user.parent? && @filter_type != "affordable" %>
+    <% inactive_rewards = Reward.where(active: false) %>
+    <% if inactive_rewards.any? %>
+      <div class="mt-8">
+        <h2 class="text-2xl font-bold mb-4 text-base-content/60">Inactive Rewards</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <% inactive_rewards.each do |reward| %>
+            <div class="card bg-base-100 shadow-lg opacity-60">
+              <div class="card-body">
+                <div class="flex justify-between items-start mb-3">
+                  <h3 class="card-title text-lg"><%= reward.name %></h3>
+                  <div class="badge badge-ghost badge-sm">Inactive</div>
+                </div>
+
+                <div class="mb-4">
+                  <div class="text-3xl font-bold text-base-content/60">
+                    <%= reward.point_cost %>
+                    <span class="text-base font-normal">points</span>
+                  </div>
+                </div>
+
+                <% if reward.description.present? %>
+                  <p class="text-sm text-base-content/50 mb-4 flex-grow">
+                    <%= truncate(reward.description, length: 100) %>
+                  </p>
+                <% else %>
+                  <div class="flex-grow"></div>
+                <% end %>
+
+                <div class="card-actions justify-end">
+                  <%= link_to toggle_active_reward_path(reward), 
+                      data: { turbo_method: :patch },
+                      class: "btn btn-success btn-sm" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    Activate
+                  <% end %>
+                  
+                  <%= link_to edit_reward_path(reward), class: "btn btn-ghost btn-sm" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    Edit
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+<% else %>
+  <!-- Empty State -->
+  <div class="text-center py-12">
+    <div class="mb-4">
+      <svg class="w-24 h-24 mx-auto text-base-content/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+      </svg>
+    </div>
+    <h3 class="text-xl font-semibold mb-2">No rewards found</h3>
+    <p class="text-base-content/60 mb-4">
+      <% case @filter_type %>
+      <% when "affordable" %>
+        You don't have enough points for any rewards yet. Complete more todos to earn points!
+      <% else %>
+        There are no rewards available yet.
+        <% if current_user.parent? %>
+          Create some rewards to motivate your family!
+        <% else %>
+          Ask a parent to add some rewards to the catalog.
+        <% end %>
+      <% end %>
+    </p>
+    <% if current_user.parent? %>
+      <%= link_to "Create your first reward", new_reward_path, class: "btn btn-primary" %>
+    <% else %>
+      <%= link_to "View todos to earn points", todos_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+<% end %>
+
+<% content_for :head do %>
+  <style>
+    .tabs-lifted .tab {
+      border-bottom-color: transparent;
+    }
+    .tabs-lifted .tab-active {
+      border-bottom-color: hsl(var(--b1));
+    }
+  </style>
+<% end %>

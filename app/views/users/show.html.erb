@@ -1,4 +1,278 @@
-<div>
-  <h1 class="font-bold text-4xl">Users#show</h1>
-  <p>Find me in app/views/users/show.html.erb</p>
+<% content_for :title, @user.name %>
+
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- Main Profile Content -->
+  <div class="flex-1">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+      <div class="flex items-center gap-4">
+        <div class="avatar placeholder">
+          <div class="bg-primary text-primary-content rounded-full w-20">
+            <span class="text-3xl font-bold"><%= @user.name.first.upcase %></span>
+          </div>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold"><%= @user.name %></h1>
+          <div class="flex gap-2 mt-2">
+            <div class="badge <%= @user.parent? ? 'badge-primary' : 'badge-secondary' %> badge-lg">
+              <%= @user.role.humanize %>
+            </div>
+            <div class="badge badge-accent badge-lg">
+              <%= pluralize(@user.points_balance, 'point') %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <%= link_to dashboard_path, class: "btn btn-ghost" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back to Dashboard
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="stats shadow">
+        <div class="stat">
+          <div class="stat-title">Todos Completed</div>
+          <div class="stat-value text-success"><%= @user.assigned_todos.completed.count %></div>
+          <div class="stat-desc">All time</div>
+        </div>
+      </div>
+
+      <div class="stats shadow">
+        <div class="stat">
+          <div class="stat-title">Pending Todos</div>
+          <div class="stat-value text-warning"><%= @user.assigned_todos.pending.count %></div>
+          <div class="stat-desc">Still to complete</div>
+        </div>
+      </div>
+
+      <div class="stats shadow">
+        <div class="stat">
+          <div class="stat-title">Todos Created</div>
+          <div class="stat-value text-info"><%= @user.created_todos.count %></div>
+          <div class="stat-desc">
+            <% if @user.parent? %>
+              For family members
+            <% else %>
+              For yourself
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card bg-base-100 shadow-lg mb-6">
+      <div class="card-body">
+        <h2 class="card-title">Recent Activity</h2>
+        
+        <% recent_transactions = @user.point_transactions.order(created_at: :desc).limit(10) %>
+        <% if recent_transactions.any? %>
+          <div class="space-y-3">
+            <% recent_transactions.each do |transaction| %>
+              <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+                <div class="flex-1">
+                  <div class="font-medium"><%= transaction.description %></div>
+                  <div class="text-sm text-base-content/60">
+                    <%= transaction.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold <%= transaction.amount > 0 ? 'text-success' : 'text-error' %>">
+                    <%= transaction.amount > 0 ? '+' : '' %><%= transaction.amount %>
+                  </div>
+                  <div class="text-xs text-base-content/60">
+                    <%= transaction.transaction_type.humanize %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="mt-4">
+            <%= link_to "View full transaction history", "#", class: "btn btn-ghost btn-sm" %>
+          </div>
+        <% else %>
+          <div class="text-center py-8">
+            <svg class="w-16 h-16 mx-auto text-base-content/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold mb-2">No activity yet</h3>
+            <p class="text-base-content/60">Complete todos to see your activity here!</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Recent Todos -->
+    <div class="card bg-base-100 shadow-lg">
+      <div class="card-body">
+        <h2 class="card-title">Recent Todos</h2>
+        
+        <% recent_todos = @user.assigned_todos.includes(:creator).order(created_at: :desc).limit(5) %>
+        <% if recent_todos.any? %>
+          <div class="space-y-3">
+            <% recent_todos.each do |todo| %>
+              <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+                <div class="flex-1">
+                  <div class="font-medium">
+                    <%= link_to todo.title, todo_path(todo), class: "hover:text-primary" %>
+                  </div>
+                  <div class="text-sm text-base-content/60">
+                    Created by <%= todo.creator.name %> • <%= todo.points %> points
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <% if todo.completed? %>
+                    <div class="badge badge-success">Completed</div>
+                  <% elsif todo.overdue? %>
+                    <div class="badge badge-error">Overdue</div>
+                  <% else %>
+                    <div class="badge badge-warning">Pending</div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="mt-4">
+            <%= link_to "View all todos", todos_path(filter: @user == current_user ? 'mine' : 'all'), class: "btn btn-ghost btn-sm" %>
+          </div>
+        <% else %>
+          <div class="text-center py-8">
+            <svg class="w-16 h-16 mx-auto text-base-content/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold mb-2">No todos yet</h3>
+            <p class="text-base-content/60">
+              <% if @user == current_user %>
+                Create your first todo to get started!
+              <% else %>
+                No todos assigned to <%= @user.name %> yet.
+              <% end %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="lg:w-80">
+    <!-- Profile Details -->
+    <div class="card bg-base-100 shadow-lg">
+      <div class="card-body">
+        <h2 class="card-title">Profile Details</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Full Name</div>
+            <div class="font-medium"><%= @user.name %></div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Email</div>
+            <div class="font-medium"><%= @user.email %></div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Role</div>
+            <div class="badge <%= @user.parent? ? 'badge-primary' : 'badge-secondary' %>">
+              <%= @user.role.humanize %>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Points Balance</div>
+            <div class="text-2xl font-bold text-primary">
+              <%= @user.points_balance %>
+              <span class="text-base font-normal text-base-content/60">points</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Member Since</div>
+            <div class="font-medium">
+              <%= @user.created_at.strftime("%B %d, %Y") %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Achievements (if they have completed todos) -->
+    <% if @user.assigned_todos.completed.any? %>
+      <div class="card bg-base-100 shadow-lg mt-4">
+        <div class="card-body">
+          <h2 class="card-title">Achievements</h2>
+          
+          <div class="space-y-3">
+            <% total_earned = @user.point_transactions.earnings.sum(:amount) %>
+            <% if total_earned > 0 %>
+              <div class="flex items-center gap-3">
+                <div class="text-2xl">🏆</div>
+                <div>
+                  <div class="font-medium">Point Earner</div>
+                  <div class="text-sm text-base-content/60">
+                    Earned <%= total_earned %> total points
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <% if @user.assigned_todos.completed.count >= 10 %>
+              <div class="flex items-center gap-3">
+                <div class="text-2xl">⭐</div>
+                <div>
+                  <div class="font-medium">Task Master</div>
+                  <div class="text-sm text-base-content/60">
+                    Completed <%= @user.assigned_todos.completed.count %> todos
+                  </div>
+                </div>
+              </div>
+            <% end %>
+
+            <% weekly_completions = @user.assigned_todos.completed.where('completed_at > ?', 1.week.ago).count %>
+            <% if weekly_completions >= 5 %>
+              <div class="flex items-center gap-3">
+                <div class="text-2xl">🔥</div>
+                <div>
+                  <div class="font-medium">On Fire</div>
+                  <div class="text-sm text-base-content/60">
+                    <%= weekly_completions %> todos this week
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Quick Actions -->
+    <div class="card bg-base-100 shadow-lg mt-4">
+      <div class="card-body">
+        <h2 class="card-title">Quick Actions</h2>
+        <div class="space-y-2">
+          <% if @user == current_user %>
+            <%= link_to "View my todos", todos_path(filter: 'mine'), class: "btn btn-ghost btn-sm w-full justify-start" %>
+            <%= link_to "Browse rewards", rewards_path, class: "btn btn-ghost btn-sm w-full justify-start" %>
+            <%= link_to "Create new todo", new_todo_path, class: "btn btn-primary btn-sm w-full justify-start" %>
+          <% else %>
+            <%= link_to "View #{@user.name}'s todos", todos_path, class: "btn btn-ghost btn-sm w-full justify-start" %>
+            <% if current_user.parent? %>
+              <%= link_to "Create todo for #{@user.name}", new_todo_path, class: "btn btn-primary btn-sm w-full justify-start" %>
+            <% end %>
+          <% end %>
+          <%= link_to "All family members", users_path, class: "btn btn-ghost btn-sm w-full justify-start" %>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

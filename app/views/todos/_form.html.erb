@@ -1,0 +1,240 @@
+<%= form_with model: @todo, local: true, class: "space-y-6" do |form| %>
+  <% if @todo.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="mt-2 list-disc list-inside">
+          <% @todo.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Left Column: Basic Info -->
+    <div class="space-y-4">
+      <!-- Title -->
+      <div class="form-control">
+        <%= form.label :title, class: "label" %>
+        <span class="label-text">Title *</span>
+        <%= form.text_field :title, 
+            class: "input input-bordered w-full #{'input-error' if @todo.errors[:title].any?}",
+            placeholder: "e.g., Take out the trash, Finish homework" %>
+        <% if @todo.errors[:title].any? %>
+          <div class="label">
+            <span class="label-text-alt text-error"><%= @todo.errors[:title].first %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Description -->
+      <div class="form-control">
+        <%= form.label :description, class: "label" %>
+        <span class="label-text">Description</span>
+        <%= form.text_area :description, 
+            class: "textarea textarea-bordered h-24 #{'textarea-error' if @todo.errors[:description].any?}",
+            placeholder: "Optional: Add more details about this todo..." %>
+      </div>
+
+      <!-- Points -->
+      <div class="form-control">
+        <%= form.label :points, class: "label" %>
+        <span class="label-text">Points *</span>
+        <%= form.number_field :points, 
+            class: "input input-bordered w-full #{'input-error' if @todo.errors[:points].any?}",
+            min: 1,
+            value: @todo.points || 1,
+            placeholder: "How many points is this worth?" %>
+        <div class="label">
+          <span class="label-text-alt">Points earned when completed</span>
+        </div>
+      </div>
+
+      <!-- Assignee -->
+      <div class="form-control" id="assignee-field">
+        <%= form.label :assignee_id, class: "label" %>
+        <span class="label-text">Assign to *</span>
+        <%= form.select :assignee_id, 
+            options_from_collection_for_select(@assignable_users, :id, :name, @todo.assignee_id),
+            { prompt: "Select person to assign..." },
+            { class: "select select-bordered w-full #{'select-error' if @todo.errors[:assignee_id].any?}" } %>
+        <% if @assignable_users.count == 1 %>
+          <div class="label">
+            <span class="label-text-alt">You can only assign todos to yourself</span>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Family-wide assignee explanation (hidden by default) -->
+      <div class="form-control hidden" id="family-wide-explanation">
+        <div class="alert alert-info">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="text-sm">
+            <div class="font-medium">Family-wide todo</div>
+            <p class="mt-1">No initial assignee needed - anyone in the family can claim and complete this todo when they're ready!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Due Date -->
+      <div class="form-control">
+        <%= form.label :due_date, class: "label" %>
+        <span class="label-text">Due Date (optional)</span>
+        <%= form.datetime_local_field :due_date, 
+            class: "input input-bordered w-full",
+            value: @todo.due_date&.strftime("%Y-%m-%dT%H:%M") %>
+        <div class="label">
+          <span class="label-text-alt">Leave blank if no specific due date</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Advanced Options -->
+    <div class="space-y-4">
+      <!-- Family Wide Option -->
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <%= form.check_box :family_wide, class: "checkbox checkbox-primary", id: "family-wide-checkbox" %>
+          <span class="label-text">
+            <span class="font-medium">Family-wide todo</span>
+            <div class="text-sm text-base-content/70 mt-1">
+              Anyone in the family can claim and complete this todo
+            </div>
+          </span>
+        </label>
+      </div>
+
+      <!-- Recurring Options -->
+      <div class="card bg-base-200">
+        <div class="card-body p-4">
+          <h3 class="card-title text-lg mb-3">Recurring Options</h3>
+          
+          <!-- Recurring Toggle -->
+          <div class="form-control">
+            <label class="label cursor-pointer">
+              <%= form.check_box :recurring, 
+                  class: "checkbox checkbox-primary",
+                  id: "recurring-checkbox" %>
+              <span class="label-text font-medium">Make this a recurring todo</span>
+            </label>
+          </div>
+
+          <!-- Recurring Type (shown when recurring is checked) -->
+          <div id="recurring-options" class="space-y-3 hidden">
+            <div class="form-control">
+              <%= form.label :recurring_type, class: "label" %>
+              <span class="label-text">Frequency</span>
+              <%= form.select :recurring_type, 
+                  [
+                    ['Daily', 'daily'],
+                    ['Weekly', 'weekly'],
+                    ['Monthly', 'monthly']
+                  ],
+                  { prompt: "Select frequency..." },
+                  { class: "select select-bordered select-sm" } %>
+            </div>
+
+            <div class="alert alert-info">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="text-sm">
+                <div class="font-medium">How recurring todos work:</div>
+                <ul class="mt-1 space-y-1">
+                  <li>• A new todo will be created automatically</li>
+                  <li>• New todos appear based on the frequency you select</li>
+                  <li>• The original todo serves as a template</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Todo Tips -->
+      <div class="alert alert-info">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="text-sm">
+          <div class="font-medium">Todo Tips:</div>
+          <ul class="mt-1 space-y-1">
+            <li>• Use clear, specific titles</li>
+            <li>• Set fair point values for the effort required</li>
+            <li>• Family-wide todos let anyone claim them</li>
+            <li>• Due dates help keep everyone on track</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t">
+    <%= link_to "Cancel", todos_path, class: "btn btn-ghost order-2 sm:order-1" %>
+    <%= form.submit (@todo.new_record? ? "Create Todo" : "Update Todo"), 
+        class: "btn btn-primary order-1 sm:order-2" %>
+  </div>
+<% end %>
+
+<!-- JavaScript for form interactions -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Family-wide todo assignee field toggle
+    const familyWideCheckbox = document.getElementById('family-wide-checkbox');
+    const assigneeField = document.getElementById('assignee-field');
+    const familyWideExplanation = document.getElementById('family-wide-explanation');
+    const assigneeSelect = document.querySelector('select[name="todo[assignee_id]"]');
+    
+    function toggleAssigneeField() {
+      if (familyWideCheckbox && familyWideCheckbox.checked) {
+        // Hide assignee field and show explanation
+        assigneeField.classList.add('hidden');
+        familyWideExplanation.classList.remove('hidden');
+        // Clear assignee selection for family-wide todos
+        if (assigneeSelect) {
+          assigneeSelect.value = '';
+        }
+      } else {
+        // Show assignee field and hide explanation
+        assigneeField.classList.remove('hidden');
+        familyWideExplanation.classList.add('hidden');
+      }
+    }
+    
+    if (familyWideCheckbox) {
+      // Set initial state
+      toggleAssigneeField();
+      // Add change listener
+      familyWideCheckbox.addEventListener('change', toggleAssigneeField);
+    }
+    
+    // Recurring options visibility toggle
+    const recurringCheckbox = document.getElementById('recurring-checkbox');
+    const recurringOptions = document.getElementById('recurring-options');
+    
+    function toggleRecurringOptions() {
+      if (recurringCheckbox && recurringOptions) {
+        if (recurringCheckbox.checked) {
+          recurringOptions.classList.remove('hidden');
+        } else {
+          recurringOptions.classList.add('hidden');
+        }
+      }
+    }
+    
+    if (recurringCheckbox) {
+      // Set initial state based on checkbox
+      toggleRecurringOptions();
+      // Add change listener
+      recurringCheckbox.addEventListener('change', toggleRecurringOptions);
+    }
+  });
+</script>

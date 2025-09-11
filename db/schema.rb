@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_10_054507) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_11_174125) do
   create_table "point_transactions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "amount", null: false
@@ -43,7 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_10_054507) do
     t.string "title", null: false
     t.text "description"
     t.integer "points", default: 1, null: false
-    t.integer "assignee_id", null: false
+    t.integer "assignee_id"
     t.integer "creator_id", null: false
     t.datetime "due_date"
     t.boolean "completed", default: false, null: false

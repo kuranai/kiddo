@@ -1,0 +1,241 @@
+<% content_for :title, "Todos" %>
+
+<div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+  <h1 class="text-3xl font-bold">Todos</h1>
+  <div class="flex gap-2">
+    <%= link_to "New Todo", new_todo_path, class: "btn btn-primary" %>
+  </div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="tabs tabs-lifted mb-6">
+  <%= link_to todos_path(filter: "all"), 
+      class: "tab #{@filter_type == 'all' ? 'tab-active' : ''}" do %>
+    All (<%= Todo.where(assignee: accessible_users).or(Todo.family_wide).count %>)
+  <% end %>
+  
+  <%= link_to todos_path(filter: "mine"), 
+      class: "tab #{@filter_type == 'mine' ? 'tab-active' : ''}" do %>
+    My Todos (<%= current_user.assigned_todos.pending.count %>)
+  <% end %>
+  
+  <% if current_user.parent? %>
+    <%= link_to todos_path(filter: "created_by_me"), 
+        class: "tab #{@filter_type == 'created_by_me' ? 'tab-active' : ''}" do %>
+      Created by Me (<%= current_user.created_todos.count %>)
+    <% end %>
+  <% end %>
+  
+  <%= link_to todos_path(filter: "family_wide"), 
+      class: "tab #{@filter_type == 'family_wide' ? 'tab-active' : ''}" do %>
+    Family Wide (<%= Todo.family_wide_available.count %>)
+  <% end %>
+  
+  <%= link_to todos_path(filter: "completed"), 
+      class: "tab #{@filter_type == 'completed' ? 'tab-active' : ''}" do %>
+    Completed
+  <% end %>
+  
+  <%= link_to todos_path(filter: "pending"), 
+      class: "tab #{@filter_type == 'pending' ? 'tab-active' : ''}" do %>
+    Pending
+  <% end %>
+  
+  <%= link_to todos_path(filter: "overdue"), 
+      class: "tab #{@filter_type == 'overdue' ? 'tab-active' : ''}" do %>
+    Overdue (<%= Todo.overdue.where(assignee: accessible_users).count %>)
+  <% end %>
+</div>
+
+<% if @todos.any? %>
+  <!-- Todo Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <% @todos.each do |todo| %>
+      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-shadow <%= 'border-l-4 border-l-error' if todo.overdue? %> <%= 'border-l-4 border-l-success' if todo.completed? %>">
+        <div class="card-body">
+          <!-- Todo Header -->
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="card-title text-lg">
+              <%= link_to todo.title, todo_path(todo), class: "hover:text-primary" %>
+            </h3>
+            <div class="flex flex-col items-end gap-1">
+              <div class="badge badge-primary">
+                <%= pluralize(todo.points, 'point') %>
+              </div>
+              <% if todo.family_wide? %>
+                <div class="badge badge-secondary badge-sm">Family Wide</div>
+              <% end %>
+              <% if todo.recurring? %>
+                <div class="badge badge-accent badge-sm">
+                  <%= todo.recurring_type.humanize %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <% if todo.description.present? %>
+            <p class="text-sm text-base-content/70 mb-3">
+              <%= truncate(todo.description, length: 100) %>
+            </p>
+          <% end %>
+
+          <!-- Todo Meta Info -->
+          <div class="text-xs text-base-content/60 space-y-1 mb-4">
+            <div class="flex justify-between">
+              <span>Assigned to:</span>
+              <span class="font-medium">
+                <% if todo.family_wide? && todo.assignee.nil? %>
+                  <span class="text-info">Available to claim</span>
+                <% else %>
+                  <%= todo.assignee.name %>
+                  <% if todo.assignee == current_user %>
+                    <span class="text-primary">(you)</span>
+                  <% end %>
+                <% end %>
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span>Created by:</span>
+              <span class="font-medium">
+                <%= todo.creator.name %>
+                <% if todo.creator == current_user %>
+                  <span class="text-primary">(you)</span>
+                <% end %>
+              </span>
+            </div>
+            <% if todo.due_date.present? %>
+              <div class="flex justify-between">
+                <span>Due:</span>
+                <span class="font-medium <%= 'text-error' if todo.overdue? %>">
+                  <%= todo.due_date.strftime("%b %d, %Y at %I:%M %p") %>
+                  <% if todo.overdue? %>
+                    <span class="text-error font-bold">(OVERDUE)</span>
+                  <% end %>
+                </span>
+              </div>
+            <% end %>
+            <% if todo.completed? %>
+              <div class="flex justify-between">
+                <span>Completed:</span>
+                <span class="font-medium text-success">
+                  <%= todo.completed_at.strftime("%b %d, %Y at %I:%M %p") %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="card-actions justify-end mt-auto">
+            <% if todo.completed? %>
+              <div class="badge badge-success gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Completed
+              </div>
+            <% else %>
+              <!-- Complete Button -->
+              <% if todo.completable_by?(current_user) %>
+                <%= link_to complete_todo_path(todo), 
+                    class: "btn btn-success btn-sm",
+                    data: { 
+                      turbo_method: :patch,
+                      confirm: "Mark '#{todo.title}' as complete and earn #{todo.points} points?" 
+                    } do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Complete
+                <% end %>
+              <% end %>
+              
+              <!-- Claim/Unclaim for Family Wide -->
+              <% if todo.family_wide? && !todo.completed? %>
+                <% if todo.assignee.nil? %>
+                  <%= link_to claim_todo_path(todo), 
+                      class: "btn btn-info btn-sm",
+                      data: { turbo_method: :patch } do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2h4a1 1 0 0 1 0 2h-1v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6H3a1 1 0 1 1 0-2h4z"></path>
+                    </svg>
+                    Claim
+                  <% end %>
+                <% elsif todo.assignee == current_user %>
+                  <%= link_to unclaim_todo_path(todo), 
+                      class: "btn btn-warning btn-sm",
+                      data: { turbo_method: :patch } do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Unclaim
+                  <% end %>
+                <% end %>
+              <% end %>
+              
+              <!-- Edit/Delete (for parents or creators) -->
+              <% if current_user.parent? || todo.creator == current_user %>
+                <%= link_to edit_todo_path(todo), class: "btn btn-ghost btn-sm" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                  Edit
+                <% end %>
+                
+                <%= link_to todo_path(todo), 
+                    method: :delete,
+                    class: "btn btn-ghost btn-sm text-error",
+                    data: { confirm: "Are you sure you want to delete '#{todo.title}'?" } do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  Delete
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <!-- Empty State -->
+  <div class="text-center py-12">
+    <div class="mb-4">
+      <svg class="w-24 h-24 mx-auto text-base-content/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+    </div>
+    <h3 class="text-xl font-semibold mb-2">No todos found</h3>
+    <p class="text-base-content/60 mb-4">
+      <% case @filter_type %>
+      <% when "mine" %>
+        You don't have any todos assigned to you right now.
+      <% when "created_by_me" %>
+        You haven't created any todos yet.
+      <% when "family_wide" %>
+        No family-wide todos are available to claim.
+      <% when "completed" %>
+        No completed todos found.
+      <% when "pending" %>
+        No pending todos found.
+      <% when "overdue" %>
+        No overdue todos found.
+      <% else %>
+        There are no todos yet.
+      <% end %>
+    </p>
+    <%= link_to "Create your first todo", new_todo_path, class: "btn btn-primary" %>
+  </div>
+<% end %>
+
+<% content_for :head do %>
+  <style>
+    .tabs-lifted .tab {
+      border-bottom-color: transparent;
+    }
+    .tabs-lifted .tab-active {
+      border-bottom-color: hsl(var(--b1));
+    }
+  </style>
+<% end %>

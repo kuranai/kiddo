@@ -1,0 +1,213 @@
+<%= form_with model: @reward, local: true, class: "space-y-6" do |form| %>
+  <% if @reward.errors.any? %>
+    <div class="alert alert-error">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <h3 class="font-bold">Please fix the following errors:</h3>
+        <ul class="mt-2 list-disc list-inside">
+          <% @reward.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Left Column: Basic Info -->
+    <div class="space-y-4">
+      <!-- Name -->
+      <div class="form-control">
+        <%= form.label :name, class: "label" %>
+        <span class="label-text">Reward Name *</span>
+        <%= form.text_field :name, 
+            class: "input input-bordered w-full #{'input-error' if @reward.errors[:name].any?}",
+            placeholder: "e.g., Extra screen time, Ice cream, New toy" %>
+        <% if @reward.errors[:name].any? %>
+          <div class="label">
+            <span class="label-text-alt text-error"><%= @reward.errors[:name].first %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Description -->
+      <div class="form-control">
+        <%= form.label :description, class: "label" %>
+        <span class="label-text">Description</span>
+        <%= form.text_area :description, 
+            class: "textarea textarea-bordered h-24 #{'textarea-error' if @reward.errors[:description].any?}",
+            placeholder: "Optional: Add details about this reward..." %>
+        <div class="label">
+          <span class="label-text-alt">Describe what the child gets when they redeem this reward</span>
+        </div>
+      </div>
+
+      <!-- Point Cost -->
+      <div class="form-control">
+        <%= form.label :point_cost, class: "label" %>
+        <span class="label-text">Point Cost *</span>
+        <%= form.number_field :point_cost, 
+            class: "input input-bordered w-full #{'input-error' if @reward.errors[:point_cost].any?}",
+            min: 1,
+            value: @reward.point_cost || 10,
+            placeholder: "How many points does this cost?" %>
+        <div class="label">
+          <span class="label-text-alt">Points required to redeem this reward</span>
+        </div>
+      </div>
+
+      <!-- Active Status -->
+      <div class="form-control">
+        <label class="label cursor-pointer">
+          <%= form.check_box :active, 
+              class: "checkbox checkbox-primary",
+              checked: @reward.active? %>
+          <span class="label-text">
+            <span class="font-medium">Active reward</span>
+            <div class="text-sm text-base-content/70 mt-1">
+              Kids can see and redeem this reward when active
+            </div>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Right Column: Tips and Preview -->
+    <div class="space-y-4">
+      <!-- Reward Preview -->
+      <div class="card bg-base-200">
+        <div class="card-body p-4">
+          <h3 class="card-title text-lg mb-3">Preview</h3>
+          
+          <div class="card bg-base-100 shadow-md">
+            <div class="card-body p-4">
+              <h4 class="card-title text-base">
+                <span id="preview-name">
+                  <%= @reward.name.present? ? @reward.name : "Reward Name" %>
+                </span>
+              </h4>
+              
+              <div class="text-2xl font-bold text-primary mb-2">
+                <span id="preview-cost">
+                  <%= @reward.point_cost || "10" %>
+                </span>
+                <span class="text-base font-normal text-base-content/60">points</span>
+              </div>
+              
+              <p class="text-sm text-base-content/70 mb-3">
+                <span id="preview-description">
+                  <%= @reward.description.present? ? truncate(@reward.description, length: 60) : "Reward description will appear here..." %>
+                </span>
+              </p>
+              
+              <div class="card-actions justify-end">
+                <button class="btn btn-success btn-sm" disabled>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                  Redeem
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reward Tips -->
+      <div class="alert alert-info">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="text-sm">
+          <div class="font-medium">Reward Tips:</div>
+          <ul class="mt-1 space-y-1">
+            <li>• Choose point costs that motivate effort</li>
+            <li>• Mix small daily rewards with bigger goals</li>
+            <li>• Include both treats and privileges</li>
+            <li>• Deactivate rewards temporarily if needed</li>
+            <li>• Consider the effort required to earn points</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Point Cost Suggestions -->
+      <div class="card bg-base-200">
+        <div class="card-body p-4">
+          <h3 class="card-title text-lg mb-3">Point Cost Ideas</h3>
+          
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span>Small treats (candy, stickers)</span>
+              <span class="font-medium">5-15 points</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Extra screen time (30 min)</span>
+              <span class="font-medium">20-30 points</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Special privileges</span>
+              <span class="font-medium">25-50 points</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Small toys or books</span>
+              <span class="font-medium">50-100 points</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Special outings</span>
+              <span class="font-medium">100-200 points</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Bigger rewards</span>
+              <span class="font-medium">200+ points</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t">
+    <%= link_to "Cancel", rewards_path, class: "btn btn-ghost order-2 sm:order-1" %>
+    <%= form.submit (@reward.new_record? ? "Create Reward" : "Update Reward"), 
+        class: "btn btn-primary order-1 sm:order-2" %>
+  </div>
+<% end %>
+
+<!-- JavaScript for live preview -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const nameField = document.querySelector('input[name="reward[name]"]');
+    const descriptionField = document.querySelector('textarea[name="reward[description]"]');
+    const costField = document.querySelector('input[name="reward[point_cost]"]');
+    
+    const previewName = document.getElementById('preview-name');
+    const previewDescription = document.getElementById('preview-description');
+    const previewCost = document.getElementById('preview-cost');
+    
+    function updatePreview() {
+      if (nameField && previewName) {
+        previewName.textContent = nameField.value || 'Reward Name';
+      }
+      
+      if (descriptionField && previewDescription) {
+        const desc = descriptionField.value || 'Reward description will appear here...';
+        previewDescription.textContent = desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
+      }
+      
+      if (costField && previewCost) {
+        previewCost.textContent = costField.value || '10';
+      }
+    }
+    
+    // Update preview on input
+    if (nameField) nameField.addEventListener('input', updatePreview);
+    if (descriptionField) descriptionField.addEventListener('input', updatePreview);
+    if (costField) costField.addEventListener('input', updatePreview);
+    
+    // Initial update
+    updatePreview();
+  });
+</script>

@@ -28,8 +28,8 @@
           </div>
           <div class="stat">
             <div class="stat-title">Active Todos</div>
-            <div class="stat-value">0</div>
-            <div class="stat-desc">Coming soon!</div>
+            <div class="stat-value"><%= @active_todos_count %></div>
+            <div class="stat-desc">Pending completion</div>
           </div>
         </div>
       </div>
@@ -72,49 +72,51 @@
     <div class="card-body">
       <h2 class="card-title">Quick Actions</h2>
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <button class="btn btn-outline btn-lg" disabled>
+        <%= link_to new_todo_path, class: "btn btn-primary btn-lg" do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
           Create Todo
-          <div class="badge badge-primary">Soon</div>
-        </button>
+        <% end %>
         
-        <button class="btn btn-outline btn-lg" disabled>
+        <%= link_to todos_path(filter: 'mine'), class: "btn btn-outline btn-lg" do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           My Todos
-          <div class="badge badge-primary">Soon</div>
-        </button>
+          <% if @my_pending_todos > 0 %>
+            <div class="badge badge-warning"><%= @my_pending_todos %></div>
+          <% end %>
+        <% end %>
 
         <% if current_user.parent? %>
-          <button class="btn btn-outline btn-lg" disabled>
+          <%= link_to rewards_path, class: "btn btn-outline btn-lg" do %>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z" />
             </svg>
             Manage Rewards
-            <div class="badge badge-primary">Soon</div>
-          </button>
+          <% end %>
         <% end %>
 
-        <button class="btn btn-outline btn-lg" disabled>
+        <%= link_to rewards_path, class: "btn btn-outline btn-lg" do %>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
           Browse Rewards
-          <div class="badge badge-primary">Soon</div>
-        </button>
+          <% if @affordable_rewards > 0 %>
+            <div class="badge badge-success"><%= @affordable_rewards %></div>
+          <% end %>
+        <% end %>
       </div>
     </div>
   </div>
 
-  <!-- Coming Soon -->
-  <div class="alert alert-info">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+  <!-- Status Update -->
+  <div class="alert alert-success">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
     <span>
-      <strong>Phase 1 Complete!</strong> 
-      Authentication system is ready. Next up: todos, rewards, and points system!
+      <strong>Phase 5 Complete!</strong> 
+      Full todo and rewards system is ready! Create todos, earn points, and redeem rewards.
     </span>
   </div>
 </div>

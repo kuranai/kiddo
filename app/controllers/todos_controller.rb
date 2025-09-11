@@ -19,6 +19,11 @@ class TodosController < ApplicationController
   def create
     @todo = Todo.new(todo_params)
     @todo.creator = current_user
+    
+    # For family-wide todos, ensure assignee_id is nil, not empty string
+    if @todo.family_wide? && @todo.assignee_id.blank?
+      @todo.assignee_id = nil
+    end
 
     if @todo.save
       redirect_to todos_path, notice: "Todo '#{@todo.title}' was created successfully!"
@@ -33,7 +38,13 @@ class TodosController < ApplicationController
   end
 
   def update
-    if @todo.update(todo_params)
+    # Handle family-wide todos assignee logic
+    params_to_update = todo_params
+    if params_to_update[:family_wide] == "1" && params_to_update[:assignee_id].blank?
+      params_to_update[:assignee_id] = nil
+    end
+    
+    if @todo.update(params_to_update)
       redirect_to todos_path, notice: "Todo '#{@todo.title}' was updated successfully!"
     else
       @assignable_users = assignable_users_for_current_user

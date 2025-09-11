@@ -1,11 +1,11 @@
 class Todo < ApplicationRecord
-  belongs_to :assignee, class_name: "User"
+  belongs_to :assignee, class_name: "User", optional: true
   belongs_to :creator, class_name: "User"
   has_many :point_transactions, dependent: :destroy
 
   validates :title, presence: true, length: { minimum: 2, maximum: 255 }
   validates :points, presence: true, numericality: { greater_than: 0 }
-  validates :assignee_id, presence: true
+  validates :assignee_id, presence: true, unless: :family_wide?
   validates :creator_id, presence: true
 
   enum :recurring_type, { daily: 0, weekly: 1, monthly: 2 }
@@ -13,6 +13,7 @@ class Todo < ApplicationRecord
   scope :completed, -> { where(completed: true) }
   scope :pending, -> { where(completed: false) }
   scope :overdue, -> { where("due_date < ? AND completed = ?", Time.current, false) }
+  scope :family_wide, -> { where(family_wide: true) }
   scope :family_wide_available, -> { where(family_wide: true, completed: false) }
   scope :assigned_to, ->(user) { where(assignee: user) }
   scope :created_by, ->(user) { where(creator: user) }

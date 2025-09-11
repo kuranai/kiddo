@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   before_action :require_login
-  helper_method :current_user, :logged_in?
+  helper_method :current_user, :logged_in?, :accessible_users
 
   private
 
@@ -18,6 +18,14 @@ class ApplicationController < ActionController::Base
   def require_login
     unless logged_in?
       redirect_to login_path, alert: "Please log in to continue"
+    end
+  end
+
+  def accessible_users
+    if current_user.parent?
+      User.all
+    else
+      [ current_user ]
     end
   end
 end

@@ -1,0 +1,20 @@
+<% content_for :title, "New Reward" %>
+
+<div class="flex items-center justify-between mb-6">
+  <div>
+    <h1 class="text-3xl font-bold">Create New Reward</h1>
+    <p class="text-base-content/60 mt-1">Add a new reward to motivate your family</p>
+  </div>
+  <%= link_to rewards_path, class: "btn btn-ghost" do %>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+    </svg>
+    Back to Rewards
+  <% end %>
+</div>
+
+<div class="card bg-base-100 shadow-lg">
+  <div class="card-body">
+    <%= render 'form' %>
+  </div>
+</div>

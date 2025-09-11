@@ -1,0 +1,282 @@
+<% content_for :title, @todo.title %>
+
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- Main Todo Content -->
+  <div class="flex-1">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+      <div class="flex-1">
+        <h1 class="text-3xl font-bold mb-2"><%= @todo.title %></h1>
+        <div class="flex flex-wrap gap-2 mb-3">
+          <div class="badge badge-primary badge-lg">
+            <%= pluralize(@todo.points, 'point') %>
+          </div>
+          <% if @todo.family_wide? %>
+            <div class="badge badge-secondary">Family Wide</div>
+          <% end %>
+          <% if @todo.recurring? %>
+            <div class="badge badge-accent">
+              <%= @todo.recurring_type.humanize %> Recurring
+            </div>
+          <% end %>
+          <% if @todo.completed? %>
+            <div class="badge badge-success">Completed</div>
+          <% elsif @todo.overdue? %>
+            <div class="badge badge-error">Overdue</div>
+          <% else %>
+            <div class="badge badge-warning">Pending</div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-2">
+        <% unless @todo.completed? %>
+          <!-- Complete Button -->
+          <% if @todo.completable_by?(current_user) %>
+            <%= link_to complete_todo_path(@todo), 
+                class: "btn btn-success",
+                data: { 
+                  turbo_method: :patch,
+                  confirm: "Mark '#{@todo.title}' as complete and earn #{@todo.points} points?" 
+                } do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              Complete
+            <% end %>
+          <% end %>
+          
+          <!-- Claim/Unclaim for Family Wide -->
+          <% if @todo.family_wide? %>
+            <% if @todo.assignee.nil? %>
+              <%= link_to claim_todo_path(@todo), 
+                  class: "btn btn-info",
+                  data: { turbo_method: :patch } do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2h4a1 1 0 0 1 0 2h-1v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6H3a1 1 0 1 1 0-2h4z"></path>
+                </svg>
+                Claim This Todo
+              <% end %>
+            <% elsif @todo.assignee == current_user %>
+              <%= link_to unclaim_todo_path(@todo), 
+                  class: "btn btn-warning",
+                  data: { turbo_method: :patch } do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Unclaim
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+        
+        <!-- Edit/Delete (for parents or creators) -->
+        <% if current_user.parent? || @todo.creator == current_user %>
+          <%= link_to edit_todo_path(@todo), class: "btn btn-ghost" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Edit
+          <% end %>
+          
+          <%= link_to @todo, 
+              method: :delete,
+              class: "btn btn-ghost text-error",
+              data: { confirm: "Are you sure you want to delete '#{@todo.title}'?" } do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Delete
+          <% end %>
+        <% end %>
+
+        <%= link_to todos_path, class: "btn btn-ghost" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Back
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <% if @todo.description.present? %>
+      <div class="card bg-base-200 mb-6">
+        <div class="card-body">
+          <h2 class="card-title text-xl">Description</h2>
+          <p class="text-base-content/80 whitespace-pre-wrap"><%= @todo.description %></p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Family Wide Info -->
+    <% if @todo.family_wide? %>
+      <div class="alert alert-info mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <h3 class="font-bold">Family-Wide Todo</h3>
+          <p class="text-sm">
+            <% if @todo.assignee.nil? %>
+              This todo is available for anyone in the family to claim and complete.
+            <% else %>
+              This todo has been claimed by <strong><%= @todo.assignee.name %></strong>.
+            <% end %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Recurring Info -->
+    <% if @todo.recurring? %>
+      <div class="alert alert-info mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        <div>
+          <h3 class="font-bold">Recurring Todo</h3>
+          <p class="text-sm">
+            This todo repeats <strong><%= @todo.recurring_type %></strong>. 
+            A new instance will be created automatically when this one is completed.
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Completion Info -->
+    <% if @todo.completed? %>
+      <div class="alert alert-success">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <h3 class="font-bold">Completed!</h3>
+          <p class="text-sm">
+            Completed by <strong><%= @todo.assignee.name %></strong> on 
+            <%= @todo.completed_at.strftime("%B %d, %Y at %I:%M %p") %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Sidebar with Todo Details -->
+  <div class="lg:w-80">
+    <div class="card bg-base-100 shadow-lg">
+      <div class="card-body">
+        <h2 class="card-title">Todo Details</h2>
+        
+        <div class="space-y-4">
+          <!-- Assignment Info -->
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Assigned to</div>
+            <div class="flex items-center gap-2 mt-1">
+              <div class="avatar placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-8">
+                  <span class="text-xs">
+                    <% if @todo.family_wide? && @todo.assignee.nil? %>
+                      ?
+                    <% else %>
+                      <%= @todo.assignee.name.first.upcase %>
+                    <% end %>
+                  </span>
+                </div>
+              </div>
+              <div>
+                <% if @todo.family_wide? && @todo.assignee.nil? %>
+                  <span class="text-info">Available to claim</span>
+                <% else %>
+                  <%= @todo.assignee.name %>
+                  <% if @todo.assignee == current_user %>
+                    <span class="text-primary text-sm">(you)</span>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Creator Info -->
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Created by</div>
+            <div class="flex items-center gap-2 mt-1">
+              <div class="avatar placeholder">
+                <div class="bg-secondary text-secondary-content rounded-full w-8">
+                  <span class="text-xs"><%= @todo.creator.name.first.upcase %></span>
+                </div>
+              </div>
+              <div>
+                <%= @todo.creator.name %>
+                <% if @todo.creator == current_user %>
+                  <span class="text-primary text-sm">(you)</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Due Date -->
+          <% if @todo.due_date.present? %>
+            <div>
+              <div class="text-sm font-medium text-base-content/60">Due Date</div>
+              <div class="mt-1 <%= 'text-error font-medium' if @todo.overdue? %>">
+                <%= @todo.due_date.strftime("%B %d, %Y") %>
+                <div class="text-sm text-base-content/60">
+                  <%= @todo.due_date.strftime("%I:%M %p") %>
+                </div>
+                <% if @todo.overdue? %>
+                  <div class="text-error text-sm font-bold">OVERDUE</div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Creation Date -->
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Created</div>
+            <div class="mt-1">
+              <%= @todo.created_at.strftime("%B %d, %Y") %>
+              <div class="text-sm text-base-content/60">
+                <%= @todo.created_at.strftime("%I:%M %p") %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Points Value -->
+          <div>
+            <div class="text-sm font-medium text-base-content/60">Point Value</div>
+            <div class="mt-1">
+              <span class="text-2xl font-bold text-primary"><%= @todo.points %></span>
+              <span class="text-base-content/60"> points</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Point Transactions (if completed) -->
+    <% if @todo.completed? && @todo.point_transactions.any? %>
+      <div class="card bg-base-100 shadow-lg mt-4">
+        <div class="card-body">
+          <h2 class="card-title">Point History</h2>
+          <div class="space-y-2">
+            <% @todo.point_transactions.each do |transaction| %>
+              <div class="flex justify-between items-center">
+                <div>
+                  <div class="font-medium"><%= transaction.user.name %></div>
+                  <div class="text-sm text-base-content/60"><%= transaction.description %></div>
+                </div>
+                <div class="text-right">
+                  <div class="font-bold text-success">+<%= transaction.amount %></div>
+                  <div class="text-xs text-base-content/60">
+                    <%= transaction.created_at.strftime("%m/%d/%Y") %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
