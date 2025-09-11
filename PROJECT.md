@@ -210,13 +210,15 @@ This project is inspired by the [Family Rewards App](https://www.familyrewards.a
 - [x] Point system integration with automatic transaction logging
 - [x] Recurring todo logic and family-wide todo support
 
-### 🚧 Phase 3: Controllers & Routes (NEXT)
-- [ ] TodosController with CRUD operations
-- [ ] RewardsController with management/redemption
-- [ ] Authorization logic for todo/reward access
-- [ ] API-like actions for completing todos and claiming family-wide todos
+### ✅ Phase 3: Controllers & Routes (COMPLETE)
+- [x] TodosController with full CRUD operations and filtering
+- [x] RewardsController with management/redemption system
+- [x] Authorization logic for role-based todo/reward access
+- [x] API-like actions for completing, claiming, and unclaiming todos
+- [x] Enhanced DashboardController with role-based data presentation
+- [x] Complete route system with RESTful and custom member routes
 
-### ⚙️ Phase 4: Background Jobs & Recurring Tasks (PLANNED)
+### ⚙️ Phase 4: Background Jobs & Recurring Tasks (NEXT)
 - [ ] Solid Queue job for recurring todo generation
 - [ ] Point transaction service
 - [ ] Notification system
@@ -408,16 +410,17 @@ bin/brakeman
 ---
 
 **Project Started**: September 9, 2025  
-**Current Status**: Phase 2 Complete - Core data models and point system ready  
-**Next Milestone**: Phase 3 - Controllers & Routes (TodosController, RewardsController)  
+**Current Status**: Phase 3 Complete - Full controller layer with authorization system ready  
+**Next Milestone**: Phase 4 - Background Jobs & Recurring Tasks (Solid Queue integration)  
 **Repository**: `/home/ploi/code/ruby/kiddo`  
 **Running Instance**: http://127.0.0.1:3000
 
-### Phase 2 Accomplishments ✅
-- **Complete Todo system** with automatic point awarding
-- **Reward redemption** with point deduction and transaction logging  
-- **Point transaction audit trail** for complete transparency
-- **Family-wide todos** that can be claimed by anyone
-- **Recurring todo logic** for daily/weekly/monthly tasks
-- **Database integrity** with proper foreign keys, constraints, and indices
-- **Model integration** with comprehensive business logic
+### Phase 3 Accomplishments ✅
+- **TodosController** with full CRUD, filtering (mine/family/completed/pending/overdue), and authorization
+- **RewardsController** with creation, redemption, and parental management controls
+- **Enhanced DashboardController** with role-based data presentation for parents vs kids
+- **Complete route system** with RESTful routes plus custom actions (complete, claim, unclaim, redeem, toggle_active)
+- **Authorization system** ensuring parents can manage all, kids restricted to appropriate access
+- **Point system integration** with automatic awarding/deduction and transaction logging
+- **Family-wide todo claiming** with first-come-first-served logic and unclaim functionality
+- **Code quality compliance** with RuboCop Rails Omakase standards

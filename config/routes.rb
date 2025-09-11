@@ -7,6 +7,23 @@ Rails.application.routes.draw do
   # User management routes
   resources :users, only: [:new, :create, :show, :index]
 
+  # Todo management routes
+  resources :todos do
+    member do
+      patch :complete
+      patch :claim
+      patch :unclaim
+    end
+  end
+
+  # Reward management routes
+  resources :rewards do
+    member do
+      patch :redeem
+      patch :toggle_active
+    end
+  end
+
   # Dashboard
   get "/dashboard", to: "dashboard#index"
   root "dashboard#index"

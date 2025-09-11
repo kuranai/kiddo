@@ -65,27 +65,31 @@ A simplified family todo list and rewards system where kids and parents can crea
 ## Phase 3: Controllers & Routes
 
 ### 3.1 Authentication Controllers
-- [ ] Create SessionsController (login/logout)
-- [ ] Create UsersController (registration for parents only)
-- [ ] Set up authentication routes
-- [ ] Add redirect logic after login (parent vs kid dashboards)
+- [x] Create SessionsController (login/logout)
+- [x] Create UsersController (registration for parents only)
+- [x] Set up authentication routes
+- [x] Add redirect logic after login (parent vs kid dashboards)
 
 ### 3.2 Todo Controllers
-- [ ] Create TodosController with CRUD actions
-- [ ] Add authorization: parents can create for anyone, kids only for themselves
-- [ ] Add complete action for marking todos done
-- [ ] Add claim action for family-wide todos
-- [ ] Add filters: my_todos, family_todos, completed, pending
+- [x] Create TodosController with CRUD actions
+- [x] Add authorization: parents can create for anyone, kids only for themselves
+- [x] Add complete action for marking todos done
+- [x] Add claim action for family-wide todos
+- [x] Add filters: my_todos, family_todos, completed, pending, overdue, created_by_me
+- [x] Add unclaim action for family-wide todos
 
 ### 3.3 Reward Controllers
-- [ ] Create RewardsController (parents can CRUD, kids can view/redeem)
-- [ ] Add redeem action with point deduction
-- [ ] Add authorization logic
+- [x] Create RewardsController (parents can CRUD, kids can view/redeem)
+- [x] Add redeem action with point deduction
+- [x] Add authorization logic
+- [x] Add toggle_active action for managing reward availability
+- [x] Add affordable filter for kids to see redeemable rewards
 
 ### 3.4 Dashboard Controller
-- [ ] Create DashboardController
-- [ ] Parent dashboard: family overview, create todos, manage rewards
-- [ ] Kid dashboard: my todos, my points, available rewards
+- [x] Create DashboardController
+- [x] Parent dashboard: family overview, create todos, manage rewards
+- [x] Kid dashboard: my todos, my points, available rewards
+- [x] Enhanced with role-based data: stats, recent activity, family-wide todos
 
 ---
 
@@ -229,7 +233,7 @@ A simplified family todo list and rewards system where kids and parents can crea
 ## Progress Tracking
 - [x] Phase 1: Authentication & User Management ✅
 - [x] Phase 2: Core Data Models ✅
-- [ ] Phase 3: Controllers & Routes
+- [x] Phase 3: Controllers & Routes ✅
 - [ ] Phase 4: Background Jobs & Recurring Tasks
 - [ ] Phase 5: Views & UI with DaisyUI
 - [ ] Phase 6: Advanced Features
@@ -238,15 +242,15 @@ A simplified family todo list and rewards system where kids and parents can crea
 
 **Started**: September 9, 2025
 **Target Completion**: [Date]
-**Status**: Phase 2 Complete ✅ - Core data models ready with full point system!
+**Status**: Phase 3 Complete ✅ - Full controller layer with authorization and point system integration!
 
 ---
 
 ## Next Steps
-1. Create TodosController with CRUD operations
-2. Create RewardsController with management/redemption
-3. Set up proper routes for all controllers
-4. Add authorization logic for todo/reward access
-5. Build todo and reward views with DaisyUI
+1. Create RecurringTodoJob using Solid Queue
+2. Build todo and reward views with DaisyUI
+3. Enhanced dashboard views with statistics
+4. Point transaction history views
+5. Mobile-optimized responsive UI
 
 *This document will be updated as features are implemented and requirements evolve.*
