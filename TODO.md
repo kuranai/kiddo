@@ -112,33 +112,33 @@ A simplified family todo list and rewards system where kids and parents can crea
 ## Phase 5: Views & UI with DaisyUI
 
 ### 5.1 Layout & Navigation
-- [ ] Create application layout with DaisyUI components
-- [ ] Add navigation bar with user info and logout
-- [ ] Add responsive design for mobile/desktop
-- [ ] Create flash message styling
+- [x] Create application layout with DaisyUI components
+- [x] Add navigation bar with user info and logout
+- [x] Add responsive design for mobile/desktop
+- [x] Create flash message styling
 
 ### 5.2 Authentication Views
-- [ ] Login form with DaisyUI styling
-- [ ] User registration form (parents only)
-- [ ] Add form validation styling
+- [x] Login form with DaisyUI styling
+- [x] User registration form (parents only)
+- [x] Add form validation styling
 
 ### 5.3 Dashboard Views
-- [ ] Parent dashboard: stats cards, quick actions, family activity
-- [ ] Kid dashboard: my todos, points balance, reward gallery
-- [ ] Add point balance display in header
+- [x] Parent dashboard: stats cards, quick actions, family activity
+- [x] Kid dashboard: my todos, points balance, reward gallery
+- [x] Add point balance display in header
 
 ### 5.4 Todo Views
-- [ ] Todo index with filtering (all/mine/completed)
-- [ ] Todo form (new/edit) with DaisyUI components
-- [ ] Todo cards with complete buttons
-- [ ] Recurring todo indicators
-- [ ] Family todo badges
+- [x] Todo index with filtering (all/mine/completed)
+- [x] Todo form (new/edit) with DaisyUI components
+- [x] Todo cards with complete buttons
+- [x] Recurring todo indicators
+- [x] Family todo badges
 
 ### 5.5 Reward Views
-- [ ] Rewards catalog grid layout
-- [ ] Reward cards with point costs
-- [ ] Redeem buttons with confirmation modals
-- [ ] Reward management for parents
+- [x] Rewards catalog grid layout
+- [x] Reward cards with point costs
+- [x] Redeem buttons with confirmation modals
+- [x] Reward management for parents
 
 ---
 
@@ -235,7 +235,7 @@ A simplified family todo list and rewards system where kids and parents can crea
 - [x] Phase 2: Core Data Models ✅
 - [x] Phase 3: Controllers & Routes ✅
 - [x] Phase 4: Background Jobs & Recurring Tasks ✅
-- [ ] Phase 5: Views & UI with DaisyUI
+- [x] Phase 5: Views & UI with DaisyUI
 - [ ] Phase 6: Advanced Features
 - [ ] Phase 7: Testing & Polish
 - [ ] Phase 8: Deployment Preparation

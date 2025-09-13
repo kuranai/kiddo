@@ -12,11 +12,7 @@
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
           <div class="flex items-center space-x-4">
-            <div class="avatar">
-              <div class="w-16 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                <span class="text-xl font-bold"><%= user.name.first.upcase %></span>
-              </div>
-            </div>
+            <%= user_avatar(user, size_class: "w-16", text_size_class: "text-xl") %>
             <div class="flex-1">
               <h2 class="card-title"><%= user.name %></h2>
               <div class="flex flex-col space-y-1">

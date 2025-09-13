@@ -6,11 +6,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
       <div class="flex items-center gap-4">
-        <div class="avatar placeholder">
-          <div class="bg-primary text-primary-content rounded-full w-20">
-            <span class="text-3xl font-bold"><%= @user.name.first.upcase %></span>
-          </div>
-        </div>
+        <%= user_avatar(@user, size_class: "w-20", text_size_class: "text-3xl") %>
         <div>
           <h1 class="text-3xl font-bold"><%= @user.name %></h1>
           <div class="flex gap-2 mt-2">
@@ -96,7 +92,7 @@
           </div>
           
           <div class="mt-4">
-            <%= link_to "View full transaction history", "#", class: "btn btn-ghost btn-sm" %>
+            <%= link_to "View full transaction history", user_point_transactions_path(@user), class: "btn btn-ghost btn-sm" %>
           </div>
         <% else %>
           <div class="text-center py-8">

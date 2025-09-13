@@ -5,7 +5,9 @@ Rails.application.routes.draw do
   delete "/logout", to: "sessions#destroy"
 
   # User management routes
-  resources :users, only: [ :new, :create, :show, :index ]
+  resources :users, only: [ :new, :create, :show, :index ] do
+    resources :point_transactions, only: [ :index ]
+  end
 
   # Todo management routes
   resources :todos do

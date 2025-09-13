@@ -47,11 +47,7 @@
             <div class="card bg-base-200 shadow-sm">
               <div class="card-body p-4">
                 <div class="flex items-center space-x-3">
-                  <div class="avatar">
-                    <div class="w-12 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                      <span class="font-bold"><%= user.name.first.upcase %></span>
-                    </div>
-                  </div>
+                  <%= user_avatar(user, size_class: "w-12", text_size_class: "text-base") %>
                   <div>
                     <h3 class="font-semibold"><%= user.name %></h3>
                     <p class="text-sm text-base-content/70">
@@ -109,14 +105,5 @@
         <% end %>
       </div>
     </div>
-  </div>
-
-  <!-- Status Update -->
-  <div class="alert alert-success">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    <span>
-      <strong>Phase 5 Complete!</strong> 
-      Full todo and rewards system is ready! Create todos, earn points, and redeem rewards.
-    </span>
   </div>
 </div>

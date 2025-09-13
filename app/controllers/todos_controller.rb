@@ -105,9 +105,9 @@ class TodosController < ApplicationController
   def filter_todos
     case params[:filter]
     when "mine"
-      current_user.assigned_todos
+      current_user.assigned_todos.pending
     when "created_by_me"
-      current_user.created_todos
+      current_user.created_todos.pending
     when "completed"
       Todo.completed.where(assignee: accessible_users)
     when "pending"
@@ -117,8 +117,8 @@ class TodosController < ApplicationController
     when "family_wide"
       Todo.family_wide_available
     else
-      # 'all' - show todos for users the current user can see
-      Todo.where(assignee: accessible_users).or(Todo.family_wide)
+      # 'all' - show only pending todos by default (completed are distracting)
+      Todo.pending.where(assignee: accessible_users).or(Todo.family_wide_available)
     end.includes(:assignee, :creator).order(created_at: :desc)
   end
 
